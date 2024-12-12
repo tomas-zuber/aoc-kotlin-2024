@@ -9,16 +9,16 @@ fun main() {
 class Day04 {
     companion object {
         fun part1(input: List<String>): Int {
-            return Grid(input).countXmas()
+            return Grid4(input).countXmas()
         }
 
         fun part2(input: List<String>): Int {
-            return Grid(input).countMas()
+            return Grid4(input).countMas()
         }
     }
 }
 
-data class Grid(val grid: List<String>) {
+data class Grid4(val grid: List<String>) {
     private val width = grid[0].length
     private val height = grid.size
 

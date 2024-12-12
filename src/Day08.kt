@@ -84,8 +84,3 @@ data class Grid8(val grid: List<String>) {
                 position.y in 0..<height
     }
 }
-
-data class Point(val x: Int, val y: Int) {
-    operator fun plus(other: Point): Point = Point(x + other.x, y + other.y)
-    operator fun minus(other: Point): Point = Point(this.x - other.x, this.y - other.y)
-}
