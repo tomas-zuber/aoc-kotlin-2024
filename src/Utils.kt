@@ -24,16 +24,34 @@ data class Grid(val grid: List<String>) {
     private val width = grid[0].length
     private val height = grid.size
 
-    val numGrid = grid.map {
-        it.map { c -> c.digitToInt() }
+    val numGrid = if (grid[0][0].isDigit()) {
+        grid.map {
+            it.map { c -> c.digitToInt() }
+        }
+    } else {
+        emptyList()
     }
+
 
     fun isValid(position: Point): Boolean {
         return position.x in 0..<width &&
                 position.y in 0..<height
     }
 
-    fun numValueAt(position: Point): Int? = if(isValid(position)) numGrid[position.y][position.x] else null
+    fun numValueAt(position: Point): Int? = if (isValid(position)) numGrid[position.y][position.x] else null
+
+    fun valueAt(position: Point): Char = grid[position.y][position.x]
+
+    fun countBorders(position: Point) = listOf(
+        position.up(),
+        position.down(),
+        position.left(),
+        position.right()
+    ).count { !isValid(it) || valueAt(it) != valueAt(position) }
+
+    fun print() {
+        grid.forEach { println(it) }
+    }
 }
 
 data class Point(val x: Int, val y: Int) {
