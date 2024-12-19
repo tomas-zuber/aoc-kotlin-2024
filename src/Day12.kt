@@ -1,6 +1,7 @@
 fun main() {
-//    val input = readInput("Day12")[0]
-    val input = ("RRRRIICCFF\n" +
+    val input2 = readInput("Day12")
+    val input = (
+            "RRRRIICCFF\n" +
             "RRRRIICCCF\n" +
             "VVRRRCCFFF\n" +
             "VVRCCCJFFF\n" +
@@ -11,7 +12,7 @@ fun main() {
             "MIIISIJEEE\n" +
             "MMMISSJEEE").split("\n")
     val startTime = System.currentTimeMillis()
-    Day12.part1(input).println()
+    // Day12.part1(input).println()
     Day12.part2(input).println()
 
     println("Runtime " + (System.currentTimeMillis() - startTime))
@@ -21,36 +22,30 @@ class Day12 {
     companion object {
 
         private val gardenMap = mutableMapOf<Char, List<Garden>>()
+        private val processable = mutableSetOf<Point>()
+        private val processed = mutableSetOf<Point>()
 
         fun part1(input: List<String>): Int {
             val grid = Grid(input)
             grid.print()
 
-            val type = grid.valueAt(Point(0, 0))
-            val garden = Garden(type)
-            gardenMap[type] = listOf(garden)
-            scanGarden(Point(0, 0), grid, garden)
+            processable.add(Point(0, 0))
+            while (processable.isNotEmpty()) {
+                val type = grid.valueAt(processable.first())
+                val garden = Garden(type)
+                gardenMap[type] = (gardenMap[type] ?: mutableListOf()) + garden
+                scanGarden(processable.first(), grid, garden)
+            }
 
             gardenMap.values.forEach { println("$it") }
-
-//            A region of R plants with price 12 * 18 = 216.
-//            A region of I plants with price 4 * 8 = 32.
-//            A region of C plants with price 14 * 28 = 392.
-//            A region of F plants with price 10 * 18 = 180.
-//            A region of V plants with price 13 * 20 = 260.
-//            A region of J plants with price 11 * 20 = 220.
-//            A region of C plants with price 1 * 4 = 4.
-//            A region of E plants with price 13 * 18 = 234.
-//            A region of I plants with price 14 * 22 = 308.
-//            A region of M plants with price 5 * 12 = 60.
-//            A region of S plants with price 3 * 8 = 24.
-//            So, it has a total price of 1930.
             return gardenMap.values.flatten().sumOf { it.borders * it.size() }
         }
 
         private fun scanGarden(point: Point, grid: Grid, garden: Garden) {
+            processable.remove(point)
             if (garden.points.contains(point)) return
             garden.addPoint(point)
+            processed.add(point)
             garden.borders += grid.countBorders(point)
 
             handlePosition(grid, point.right(), garden)
@@ -64,10 +59,8 @@ class Day12 {
                 val pointType = grid.valueAt(point)
                 if (pointType == garden.name) {
                     scanGarden(point, grid, garden)
-                } else {
-                    val existing = gardenMap[pointType]?.firstOrNull { it.points.contains(point) }
-                    val newGarden = existing ?: Garden(pointType).also { gardenMap[pointType] = (gardenMap[pointType] ?: emptyList()) + it }
-                    scanGarden(point, grid, newGarden)
+                } else if (!processed.contains(point)) {
+                    processable.add(point)
                 }
             }
         }
